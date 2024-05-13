@@ -1,6 +1,7 @@
 package theme
 
 import (
+	"slices"
 	"strings"
 )
 
@@ -19,10 +20,15 @@ type Theme interface {
     Update()
 }
 
+var (
+    staticPresets = []string{
+        "terra", "arch",
+    }
+)
+
 func GetTheme(name string) Theme {
-    switch strings.ToLower(name) {
-    case "terra":
-        return Terra{}
+    if slices.Contains(staticPresets, strings.ToLower(name)) {
+        return GetStaticTheme(name)
     }
 
     return nil
