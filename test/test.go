@@ -58,7 +58,7 @@ func (this *Test) View() string {
     for i := range (this.pos[0] + 1) {
         wordStyle := style.Copy()
         if i < this.pos[0] && this.Words[i] != this.typedWords[i] {
-            wordStyle.Underline(true)
+            this.Config.StyleWrongWordUnderline(wordStyle)
         }
 
         for j, char := range this.typedWords[i] {

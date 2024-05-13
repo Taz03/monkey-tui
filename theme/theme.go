@@ -1,6 +1,8 @@
 package theme
 
 import (
+	"encoding/json"
+	"os"
 	"slices"
 	"strings"
 )
@@ -20,11 +22,18 @@ type Theme interface {
     Update()
 }
 
-var (
-    staticPresets = []string{
-        "terra", "arch",
+var staticPresets []string
+
+func init() {
+    var model struct {
+        Names []string `json:"names"`
     }
-)
+
+    fileContent, _ := os.ReadFile("static_presets.json")
+    json.Unmarshal(fileContent, &model)
+
+    staticPresets = model.Names
+}
 
 func GetTheme(name string) Theme {
     if slices.Contains(staticPresets, strings.ToLower(name)) {

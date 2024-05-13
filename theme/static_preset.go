@@ -32,7 +32,7 @@ func GetStaticTheme(themeName string) Theme {
     bodySlice, _ := io.ReadAll(response.Body)
 	body := string(bodySlice)
 
-	return StaticPreset{
+    val := StaticPreset{
 		backgroundColor:         readColor(body, "bg-color"),
 		mainColor:               readColor(body, "main-color"),
 		caretColor:              readColor(body, "caret-color"),
@@ -44,6 +44,8 @@ func GetStaticTheme(themeName string) Theme {
 		colorfulErrorColor:      readColor(body, "colorful-error-color"),
 		colorfulErrorExtraColor: readColor(body, "colorful-error-extra-color"),
 	}
+
+    return val
 }
 
 func readColor(body, name string) string {
