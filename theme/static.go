@@ -34,7 +34,7 @@ func GetStaticTheme(themeName string) Theme {
     bodySlice, _ := io.ReadAll(response.Body)
 	body := string(bodySlice)
 
-    val := StaticPreset{
+    val := &StaticPreset{
 		backgroundColor:         readColor(body, "bg-color"),
 		mainColor:               readColor(body, "main-color"),
 		caretColor:              readColor(body, "caret-color"),
@@ -55,44 +55,45 @@ func readColor(body, name string) string {
 	return colorRegex.FindStringSubmatch(body)[1]
 }
 
-func (this StaticPreset) BackgroundColor() string {
+func (this *StaticPreset) BackgroundColor() string {
 	return this.backgroundColor
 }
 
-func (this StaticPreset) MainColor() string {
+func (this *StaticPreset) MainColor() string {
 	return this.mainColor
 }
 
-func (this StaticPreset) CaretColor() string {
+func (this *StaticPreset) CaretColor() string {
 	return this.caretColor
 }
 
-func (this StaticPreset) SubColor() string {
+func (this *StaticPreset) SubColor() string {
 	return this.subColor
 }
 
-func (this StaticPreset) SubAltColor() string {
+func (this *StaticPreset) SubAltColor() string {
 	return this.subAltColor
 }
 
-func (this StaticPreset) TextColor() string {
+func (this *StaticPreset) TextColor() string {
 	return this.textColor
 }
 
-func (this StaticPreset) ErrorColor() string {
+func (this *StaticPreset) ErrorColor() string {
 	return this.errorColor
 }
 
-func (this StaticPreset) ErrorExtraColor() string {
+func (this *StaticPreset) ErrorExtraColor() string {
 	return this.errorExtraColor
 }
 
-func (this StaticPreset) ColorfulErrorColor() string {
+func (this *StaticPreset) ColorfulErrorColor() string {
 	return this.colorfulErrorColor
 }
 
-func (this StaticPreset) ColorfulErrorExtraColor() string {
+func (this *StaticPreset) ColorfulErrorExtraColor() string {
 	return this.colorfulErrorExtraColor
 }
 
-func (_ StaticPreset) Update(_ *tea.Program) {}
+func (_ *StaticPreset) Init() {}
+func (_ *StaticPreset) Update(_ *tea.Program) {}

@@ -1,36 +1,10 @@
 package theme
 
 import (
-	"fmt"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-type RGB struct {
-	R, G, B int
-}
-
-func rgbToHex(r, g, b int) string {
-	return fmt.Sprintf("#%02X%02X%02X", r, g, b)
-}
-
-func interpolateColor(color1, color2 RGB, steps int) []string {
-	var interpolatedColors []string
-
-	deltaR := float64(color2.R-color1.R) / float64(steps)
-	deltaG := float64(color2.G-color1.G) / float64(steps)
-	deltaB := float64(color2.B-color1.B) / float64(steps)
-
-	for i := 0; i < steps; i++ {
-		r := color1.R + int(deltaR*float64(i))
-		g := color1.G + int(deltaG*float64(i))
-		b := color1.B + int(deltaB*float64(i))
-		interpolatedColors = append(interpolatedColors, rgbToHex(r, g, b))
-	}
-
-	return interpolatedColors
-}
 
 // implements Theme
 type RGBTheme struct {
@@ -48,12 +22,6 @@ type RGBTheme struct {
 
 var interpolatedColors []string
 
-func init() {
-    startColor := RGB{255, 0, 0}
-    endColor := RGB{0, 0, 255}
-    interpolatedColors = interpolateColor(startColor, endColor, 100)
-}
-
 func (this *RGBTheme) Init() {
     this.backgroundColor = "#111"
     this.mainColor = "#eee"
@@ -65,6 +33,23 @@ func (this *RGBTheme) Init() {
     this.errorExtraColor = "#b3b3b3"
     this.colorfulErrorColor = "#eee"
     this.colorfulErrorExtraColor = "#b3b3b3"
+
+    c1 := RGB{76, 174, 76}
+    c2 := RGB{64, 158, 181}
+    c3 := RGB{129, 52, 244}
+    c4 := RGB{241, 14, 25}
+    c5 := RGB{255, 197, 5}
+    c6 := RGB{76, 174, 76}
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c1, c2, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c2, c3, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c3, c4, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c4, c5, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c5, c6, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c6, c5, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c5, c4, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c4, c3, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c3, c2, 25)...)
+    interpolatedColors = append(interpolatedColors, InterpolateColor(c2, c1, 25)...)
 }
 
 func (this *RGBTheme) BackgroundColor() string {
@@ -114,7 +99,7 @@ func (this *RGBTheme) Update(app *tea.Program) {
             this.textColor = color
 
             app.Send(color)
-            time.Sleep(time.Millisecond * 50)
+            time.Sleep(time.Millisecond * 25)
         }
     }
 }

@@ -21,6 +21,7 @@ type Theme interface {
     ColorfulErrorColor() string
     ColorfulErrorExtraColor() string
 
+    Init()
     Update(*tea.Program)
 }
 
@@ -37,17 +38,17 @@ func init() {
     staticPresets = model.Names
 }
 
-func GetTheme(name string) Theme {
+func GetTheme(name string) (theme Theme) {
     if slices.Contains(staticPresets, strings.ToLower(name)) {
-        return GetStaticTheme(name)
+        theme = GetStaticTheme(name)
     }
 
     switch strings.ToLower(name) {
     case "rgb":
-        rgb := &RGBTheme{}
-        rgb.Init()
-        return rgb
+        theme = &RGBTheme{}
     }
 
-    return nil
+    theme.Init()
+
+    return
 }
