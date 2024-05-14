@@ -85,30 +85,28 @@ type Config struct {
 	TapeMode                string    `json:"tapeMode"`
 	MaxLineWidth            int       `json:"maxLineWidth"`
 
-    theme theme.Theme
+    MonkeyTheme theme.Theme
 }
 
-var UserConfig Config
+func New(path string) (config Config) {
+    fileContent, _ := os.ReadFile(path)
+    json.Unmarshal(fileContent, &config)
 
-func init() {
-    fileContent, _ := os.ReadFile("config.json")
-    json.Unmarshal(fileContent, &UserConfig)
-
-    UserConfig.theme = theme.GetTheme(UserConfig.Theme)
-    //go UserConfig.theme.Update()
+    config.MonkeyTheme = theme.GetTheme(config.Theme)
+    return
 }
 
 func (this *Config) BackgroundColor() lipgloss.TerminalColor {
     if this.CustomBackgroundFilter[3] > 0.5 {
         return lipgloss.NoColor{}
     } else {
-        return lipgloss.Color(this.theme.BackgroundColor())
+        return lipgloss.Color(this.MonkeyTheme.BackgroundColor())
     }
 }
 
 func (this *Config) Cursor() cursor.Model {
     return cursor.Model{
-        Style: lipgloss.NewStyle().Background(lipgloss.Color(this.theme.CaretColor())),
+        Style: lipgloss.NewStyle().Background(lipgloss.Color(this.MonkeyTheme.CaretColor())),
     }
 }
 
@@ -123,11 +121,11 @@ func (this *Config) StyleWrongWordUnderline(style lipgloss.Style) {
 func (this *Config) StyleUntyped(style lipgloss.Style, word string) lipgloss.Style {
     style = style.SetString(word)
 
-    foregroundColor := this.theme.SubColor()
+    foregroundColor := this.MonkeyTheme.SubColor()
     if this.FlipTestColors && this.ColorfulMode {
-        foregroundColor = this.theme.MainColor()
+        foregroundColor = this.MonkeyTheme.MainColor()
     } else if this.FlipTestColors {
-        foregroundColor = this.theme.TextColor()
+        foregroundColor = this.MonkeyTheme.TextColor()
     }
     style = style.Foreground(lipgloss.Color(foregroundColor))
 
@@ -137,11 +135,11 @@ func (this *Config) StyleUntyped(style lipgloss.Style, word string) lipgloss.Sty
 func (this *Config) StyleCorrect(style lipgloss.Style, word string) lipgloss.Style {
     style = style.SetString(word)
 
-    foregroundColor := this.theme.TextColor()
+    foregroundColor := this.MonkeyTheme.TextColor()
     if this.FlipTestColors {
-        foregroundColor = this.theme.SubColor()
+        foregroundColor = this.MonkeyTheme.SubColor()
     } else if this.ColorfulMode {
-        foregroundColor = this.theme.MainColor()
+        foregroundColor = this.MonkeyTheme.MainColor()
     }
     style = style.Foreground(lipgloss.Color(foregroundColor))
 
@@ -154,9 +152,9 @@ func (this *Config) StyleError(style lipgloss.Style, typed, word string) lipglos
         return style
     }
 
-    foregroundColor := this.theme.ErrorColor()
+    foregroundColor := this.MonkeyTheme.ErrorColor()
     if this.ColorfulMode {
-        foregroundColor = this.theme.ColorfulErrorColor()
+        foregroundColor = this.MonkeyTheme.ColorfulErrorColor()
     }
     style.Foreground(lipgloss.Color(foregroundColor))
 
@@ -177,9 +175,9 @@ func (this *Config) StyleErrorExtra(style lipgloss.Style, char string) lipgloss.
 
     style = style.SetString(char)
 
-    foregroundColor := this.theme.ErrorExtraColor()
+    foregroundColor := this.MonkeyTheme.ErrorExtraColor()
     if this.ColorfulMode {
-        foregroundColor = this.theme.ColorfulErrorExtraColor()
+        foregroundColor = this.MonkeyTheme.ColorfulErrorExtraColor()
     }
     style.Foreground(lipgloss.Color(foregroundColor))
 

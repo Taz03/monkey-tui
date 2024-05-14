@@ -5,6 +5,8 @@ import (
 	"os"
 	"slices"
 	"strings"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 type Theme interface {
@@ -19,7 +21,7 @@ type Theme interface {
     ColorfulErrorColor() string
     ColorfulErrorExtraColor() string
 
-    Update()
+    Update(*tea.Program)
 }
 
 var staticPresets []string
@@ -38,6 +40,13 @@ func init() {
 func GetTheme(name string) Theme {
     if slices.Contains(staticPresets, strings.ToLower(name)) {
         return GetStaticTheme(name)
+    }
+
+    switch strings.ToLower(name) {
+    case "rgb":
+        rgb := &RGBTheme{}
+        rgb.Init()
+        return rgb
     }
 
     return nil

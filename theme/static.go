@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 // implements Theme
@@ -93,4 +95,4 @@ func (this StaticPreset) ColorfulErrorExtraColor() string {
 	return this.colorfulErrorExtraColor
 }
 
-func (_ StaticPreset) Update() {}
+func (_ StaticPreset) Update(_ *tea.Program) {}

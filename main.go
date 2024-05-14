@@ -8,7 +8,8 @@ import (
 )
 
 type model struct {
-	Test *test.Test
+	Test   *test.Test
+    Config *config.Config
 }
 
 var (
@@ -17,12 +18,17 @@ var (
 )
 
 func main() {
+    userConfig := config.New("config.json")
+
 	app := tea.NewProgram(model{
 		Test: &test.Test{
 			Words:  []string{"The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"},
-			Config: config.UserConfig,
+			Config: userConfig,
 		},
+        Config: &userConfig,
 	}, tea.WithAltScreen())
+    go userConfig.MonkeyTheme.Update(app)
+
 	app.Run()
 }
 
@@ -41,7 +47,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		default:
 			m.Test.Update(msg)
-			return m, nil
 		}
 	}
 
@@ -49,5 +54,5 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, m.Test.View(), lipgloss.WithWhitespaceBackground(config.UserConfig.BackgroundColor()))
+	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, m.Test.View(), lipgloss.WithWhitespaceBackground(m.Config.BackgroundColor()))
 }
