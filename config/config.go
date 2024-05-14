@@ -106,7 +106,7 @@ func (this *Config) BackgroundColor() lipgloss.TerminalColor {
 
 func (this *Config) Cursor() cursor.Model {
     return cursor.Model{
-        Style: lipgloss.NewStyle().Background(lipgloss.Color(this.MonkeyTheme.CaretColor())),
+        Style: lipgloss.NewStyle().Foreground(lipgloss.Color(this.MonkeyTheme.CaretColor())),
     }
 }
 

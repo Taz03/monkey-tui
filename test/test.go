@@ -3,6 +3,7 @@ package test
 import (
 	"strings"
 
+	"github.com/charmbracelet/bubbles/cursor"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/taz03/monkeytui/config"
@@ -14,10 +15,12 @@ type Test struct {
 
     typedWords []string
     pos        [2]int
+    cursor     cursor.Model
 }
 
 func (this *Test) Init() tea.Cmd {
     this.typedWords = []string{""}
+    this.cursor = this.Config.Cursor()
     return nil
 }
 
@@ -87,11 +90,19 @@ func (this *Test) View() string {
         }
     }
 
+    untyped := strings.Builder{}
     if len(this.Words[this.pos[0]]) > len(this.typedWords[this.pos[0]]) {
-        test.WriteString(this.Config.StyleUntyped(style.Copy(), this.Words[this.pos[0]][this.pos[1]:]).Render())
+        untyped.WriteString(this.Words[this.pos[0]][this.pos[1]:])
     }
-    test.WriteString(styledWhitespace)
-    test.WriteString(this.Config.StyleUntyped(style.Copy(), strings.Join(this.Words[this.pos[0] + 1:], " ")).Render())
+    untyped.WriteString(" ")
+    untyped.WriteString(strings.Join(this.Words[this.pos[0] + 1:], " "))
 
-    return test.String()
+    untypedString := untyped.String()
+    this.cursor.SetChar(string(untypedString[0]))
+    untypedString = untypedString[1:]
+
+    test.WriteString(this.cursor.View())
+    test.WriteString(this.Config.StyleUntyped(style.Copy(), untypedString).Render())
+
+    return strings.TrimRight(test.String(), styledWhitespace)
 }

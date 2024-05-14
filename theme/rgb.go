@@ -114,7 +114,7 @@ func (this *RGBTheme) Update(app *tea.Program) {
             this.textColor = color
 
             app.Send(color)
-            time.Sleep(time.Millisecond * 20)
+            time.Sleep(time.Millisecond * 50)
         }
     }
 }
