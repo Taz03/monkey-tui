@@ -22,7 +22,7 @@ func main() {
 
 	app := tea.NewProgram(model{
 		Test: &test.Test{
-			Words:  []string{"The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"},
+			Words:  []string{"The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog", "The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog", "The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"},
 			Config: userConfig,
 		},
         Config: &userConfig,
@@ -30,6 +30,18 @@ func main() {
     go userConfig.MonkeyTheme.Update(app)
 
 	app.Run()
+}
+
+func (this model) calculateTestWidth() int {
+    if this.Config.MaxLineWidth == 0 {
+        return width - 10
+    }
+    
+    if this.Config.MaxLineWidth > width {
+        return width
+    }
+
+    return this.Config.MaxLineWidth
 }
 
 func (m model) Init() tea.Cmd {
@@ -41,6 +53,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		width, height = msg.Width, msg.Height
+        m.Test.Width = m.calculateTestWidth()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -54,5 +67,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, m.Test.View(), lipgloss.WithWhitespaceBackground(m.Config.BackgroundColor()))
+	return lipgloss.Place(
+        width,
+        height,
+        lipgloss.Center,
+        lipgloss.Center,
+        m.Test.View(),
+        lipgloss.WithWhitespaceBackground(m.Config.BackgroundColor()),
+    )
 }

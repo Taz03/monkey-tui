@@ -107,7 +107,7 @@ func (this *Config) BackgroundColor() lipgloss.TerminalColor {
 
 func (this *Config) Cursor() cursor.Model {
 	return cursor.Model{
-		Style: lipgloss.NewStyle().Foreground(lipgloss.Color(this.MonkeyTheme.CaretColor())),
+		Style: lipgloss.NewStyle().Foreground(lipgloss.Color(this.MonkeyTheme.CaretColor())).Background(lipgloss.Color(this.MonkeyTheme.SubColor())),
 	}
 }
 
@@ -115,7 +115,7 @@ func (this *Config) StyleWrongWordUnderline(style lipgloss.Style) {
 	if this.BlindMode {
 		style.Underline(false)
 	} else {
-		style.Underline(true)
+		style.Underline(true).UnderlineSpaces(false)
 	}
 }
 
