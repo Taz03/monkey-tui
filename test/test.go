@@ -17,7 +17,7 @@ type Model struct {
     Width int
 
     config     *config.Model
-    words      []string
+    words      *[]string
     typedWords []string
     pos        [2]int
 }
@@ -29,6 +29,7 @@ func New(config *config.Model) *Model {
 
     return &Model{
         config:     config,
+        words:      GenerateWords(config),
         typedWords: []string{""},
     }
 }
@@ -41,6 +42,8 @@ func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     switch msg := msg.(type) {
     case tea.KeyMsg:
         switch msg.String() {
+        case "tab":
+            *this.words = nil
         case " ":
             this.typedWords = append(this.typedWords, "")
             this.pos[0]++
