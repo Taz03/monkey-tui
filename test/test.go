@@ -28,7 +28,7 @@ func New(config *config.Model) *Model {
     space = lipgloss.NewStyle().Background(config.BackgroundColor()).Render(" ")
 
     return &Model{
-        config: config,
+        config:     config,
         typedWords: []string{""},
     }
 }
