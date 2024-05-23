@@ -86,12 +86,12 @@ func (this *Model) renderWord(i int) string {
     words := *this.words
 
     if i >= len(this.typedWords) {
-        return this.config.StyleUntyped(style.Copy(), words[i] + " ").Render()
+        return this.config.StyleUntyped(style, words[i] + " ").Render()
     }
 
-    wordStyle := style.Copy()
+    wordStyle := style
     if i < this.pos[0] && words[i] != this.typedWords[i] {
-        this.config.StyleWrongWordUnderline(wordStyle)
+        wordStyle = this.config.StyleWrongWordUnderline(wordStyle)
     }
 
     var renderedWord strings.Builder
@@ -99,11 +99,11 @@ func (this *Model) renderWord(i int) string {
         str := string(char)
         switch {
         case j >= len(words[i]):
-            renderedWord.WriteString(this.config.StyleErrorExtra(wordStyle.Copy(), str).Render())
+            renderedWord.WriteString(this.config.StyleErrorExtra(wordStyle, str).Render())
         case str != string(words[i][j]):
-            renderedWord.WriteString(this.config.StyleError(wordStyle.Copy(), str, string(words[i][j])).Render())
+            renderedWord.WriteString(this.config.StyleError(wordStyle, str, string(words[i][j])).Render())
         default:
-            renderedWord.WriteString(this.config.StyleCorrect(wordStyle.Copy(), str).Render())
+            renderedWord.WriteString(this.config.StyleCorrect(wordStyle, str).Render())
         }
     }
 

@@ -111,12 +111,12 @@ func (this *Model) Cursor() cursor.Model {
 	}
 }
 
-func (this *Model) StyleWrongWordUnderline(style lipgloss.Style) {
+func (this *Model) StyleWrongWordUnderline(style lipgloss.Style) lipgloss.Style {
 	if this.BlindMode {
-		style.Underline(false)
-	} else {
-		style.Underline(true).UnderlineSpaces(false)
+		return style.UnsetUnderline()
 	}
+
+    return style.Underline(true).UnderlineSpaces(false)
 }
 
 func (this *Model) StyleUntyped(style lipgloss.Style, word string) lipgloss.Style {
