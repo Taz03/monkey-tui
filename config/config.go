@@ -10,7 +10,7 @@ import (
 	"github.com/taz03/monkeytui/theme"
 )
 
-type Config struct {
+type Model struct {
 	Theme                   string   `json:"theme"`
 	ThemeDark               string   `json:"themeDark"`
 	ThemeLight              string   `json:"themeLight"`
@@ -89,7 +89,7 @@ type Config struct {
 	MonkeyTheme theme.Theme
 }
 
-func New(path string) (config Config) {
+func New(path string) (config *Model) {
 	fileContent, _ := os.ReadFile(path)
 	json.Unmarshal(fileContent, &config)
 
@@ -97,7 +97,7 @@ func New(path string) (config Config) {
 	return
 }
 
-func (this *Config) BackgroundColor() lipgloss.TerminalColor {
+func (this *Model) BackgroundColor() lipgloss.TerminalColor {
 	if strings.Trim(this.CustomBackground, " ") != "" {
 		return lipgloss.NoColor{}
 	} else {
@@ -105,13 +105,13 @@ func (this *Config) BackgroundColor() lipgloss.TerminalColor {
 	}
 }
 
-func (this *Config) Cursor() cursor.Model {
+func (this *Model) Cursor() cursor.Model {
 	return cursor.Model{
 		Style: lipgloss.NewStyle().Foreground(lipgloss.Color(this.MonkeyTheme.CaretColor())).Background(lipgloss.Color(this.MonkeyTheme.SubColor())),
 	}
 }
 
-func (this *Config) StyleWrongWordUnderline(style lipgloss.Style) {
+func (this *Model) StyleWrongWordUnderline(style lipgloss.Style) {
 	if this.BlindMode {
 		style.Underline(false)
 	} else {
@@ -119,7 +119,7 @@ func (this *Config) StyleWrongWordUnderline(style lipgloss.Style) {
 	}
 }
 
-func (this *Config) StyleUntyped(style lipgloss.Style, word string) lipgloss.Style {
+func (this *Model) StyleUntyped(style lipgloss.Style, word string) lipgloss.Style {
 	style = style.SetString(word)
 
 	foregroundColor := this.MonkeyTheme.SubColor()
@@ -133,7 +133,7 @@ func (this *Config) StyleUntyped(style lipgloss.Style, word string) lipgloss.Sty
 	return style
 }
 
-func (this *Config) StyleCorrect(style lipgloss.Style, word string) lipgloss.Style {
+func (this *Model) StyleCorrect(style lipgloss.Style, word string) lipgloss.Style {
 	style = style.SetString(word)
 
 	foregroundColor := this.MonkeyTheme.TextColor()
@@ -147,7 +147,7 @@ func (this *Config) StyleCorrect(style lipgloss.Style, word string) lipgloss.Sty
 	return style
 }
 
-func (this *Config) StyleError(style lipgloss.Style, typed, word string) lipgloss.Style {
+func (this *Model) StyleError(style lipgloss.Style, typed, word string) lipgloss.Style {
 	if this.BlindMode {
 		style = this.StyleCorrect(style, word)
 		return style
@@ -168,7 +168,7 @@ func (this *Config) StyleError(style lipgloss.Style, typed, word string) lipglos
 	}
 }
 
-func (this *Config) StyleErrorExtra(style lipgloss.Style, char string) lipgloss.Style {
+func (this *Model) StyleErrorExtra(style lipgloss.Style, char string) lipgloss.Style {
 	if this.HideExtraLetters || this.BlindMode {
 		style = style.SetString("")
 		return style

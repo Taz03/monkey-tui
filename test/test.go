@@ -13,27 +13,31 @@ var (
     space string
 )
 
-type Test struct {
-    Words  []string
-    Config config.Config
-
+type Model struct {
     Width int
 
+    config     *config.Model
+    words      []string
     typedWords []string
     pos        [2]int
 }
 
-func (this *Test) Init() tea.Cmd {
-    this.typedWords = []string{""}
+func New(config *config.Model) *Model {
+    style = lipgloss.NewStyle().Background(config.BackgroundColor()).Bold(true)
+    caret = config.Cursor()
+    space = lipgloss.NewStyle().Background(config.BackgroundColor()).Render(" ")
 
-    style = lipgloss.NewStyle().Background(this.Config.BackgroundColor()).Bold(true)
-    caret = this.Config.Cursor()
-    space = lipgloss.NewStyle().Background(this.Config.BackgroundColor()).Render(" ")
+    return &Model{
+        config: config,
+        typedWords: []string{""},
+    }
+}
 
+func (this *Model) Init() tea.Cmd {
     return nil
 }
 
-func (this *Test) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     switch msg := msg.(type) {
     case tea.KeyMsg:
         switch msg.String() {

@@ -2,7 +2,7 @@ package test
 
 import "strings"
 
-func (this *Test) View() string {
+func (this *Model) View() string {
     rows := this.focusedRows(this.partitionedRows())
 
     var renderedRows []string
@@ -26,12 +26,12 @@ type rowModel struct {
     indices []int
 }
 
-func (this *Test) partitionedRows() (rows []rowModel) {
+func (this *Model) partitionedRows() (rows []rowModel) {
     var row rowModel
-    for i := range this.Words {
+    for i := range this.words {
         var word string
-        if i >= len(this.typedWords) || len(this.Words[i]) >= len(this.typedWords[i]) {
-            word = this.Words[i]
+        if i >= len(this.typedWords) || len(this.words[i]) >= len(this.typedWords[i]) {
+            word = this.words[i]
         } else {
             word = this.typedWords[i]
         }
@@ -55,7 +55,7 @@ func (this *Test) partitionedRows() (rows []rowModel) {
     return
 }
 
-func (this *Test) focusedRows(rows []rowModel) (focusedRows []rowModel) {
+func (this *Model) focusedRows(rows []rowModel) (focusedRows []rowModel) {
     for i, row := range rows {
         for _, index := range row.indices {
             if this.pos[0] == index {
@@ -67,7 +67,7 @@ func (this *Test) focusedRows(rows []rowModel) (focusedRows []rowModel) {
                 }
 
                 if i == len(rows) - 1 {
-                    for i := len(rows) - 3; i >= 0 && i < len(rows); i++ {
+                    for i := max(len(rows) - 3, 0); i >= 0 && i < len(rows); i++ {
                         focusedRows = append(focusedRows, rows[i])
                     }
                     return
@@ -81,37 +81,37 @@ func (this *Test) focusedRows(rows []rowModel) (focusedRows []rowModel) {
     return
 }
 
-func (this *Test) renderWord(i int) string {
+func (this *Model) renderWord(i int) string {
     if i >= len(this.typedWords) {
-        return this.Config.StyleUntyped(style.Copy(), this.Words[i] + " ").Render()
+        return this.config.StyleUntyped(style.Copy(), this.words[i] + " ").Render()
     }
 
     wordStyle := style.Copy()
-    if i < this.pos[0] && this.Words[i] != this.typedWords[i] {
-        this.Config.StyleWrongWordUnderline(wordStyle)
+    if i < this.pos[0] && this.words[i] != this.typedWords[i] {
+        this.config.StyleWrongWordUnderline(wordStyle)
     }
 
     var renderedWord strings.Builder
     for j, char := range this.typedWords[i] {
         str := string(char)
         switch {
-        case j >= len(this.Words[i]):
-            renderedWord.WriteString(this.Config.StyleErrorExtra(wordStyle.Copy(), str).Render())
-        case str != string(this.Words[i][j]):
-            renderedWord.WriteString(this.Config.StyleError(wordStyle.Copy(), str, string(this.Words[i][j])).Render())
+        case j >= len(this.words[i]):
+            renderedWord.WriteString(this.config.StyleErrorExtra(wordStyle.Copy(), str).Render())
+        case str != string(this.words[i][j]):
+            renderedWord.WriteString(this.config.StyleError(wordStyle.Copy(), str, string(this.words[i][j])).Render())
         default:
-            renderedWord.WriteString(this.Config.StyleCorrect(wordStyle.Copy(), str).Render())
+            renderedWord.WriteString(this.config.StyleCorrect(wordStyle.Copy(), str).Render())
         }
     }
 
     var remainingWord string
-    if len(this.Words[i]) > len(this.typedWords[i]) {
-        remainingWord += this.Words[i][len(this.typedWords[i]):]
+    if len(this.words[i]) > len(this.typedWords[i]) {
+        remainingWord += this.words[i][len(this.typedWords[i]):]
     }
     remainingWord += " "
 
     if i < this.pos[0] {
-        renderedWord.WriteString(this.Config.StyleUntyped(wordStyle, remainingWord).Render())
+        renderedWord.WriteString(this.config.StyleUntyped(wordStyle, remainingWord).Render())
 
         return renderedWord.String()
     }
@@ -119,7 +119,7 @@ func (this *Test) renderWord(i int) string {
     caret.SetChar(string(remainingWord[0]))
     renderedWord.WriteString(caret.View())
 
-    renderedWord.WriteString(this.Config.StyleUntyped(wordStyle, remainingWord[1:]).Render())
+    renderedWord.WriteString(this.config.StyleUntyped(wordStyle, remainingWord[1:]).Render())
 
     return renderedWord.String()
 }

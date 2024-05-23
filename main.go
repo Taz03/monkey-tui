@@ -8,8 +8,8 @@ import (
 )
 
 type model struct {
-	Test   *test.Test
-    Config *config.Config
+	Test   *test.Model
+    Config *config.Model
 }
 
 var (
@@ -21,11 +21,8 @@ func main() {
     userConfig := config.New("config.json")
 
 	app := tea.NewProgram(model{
-		Test: &test.Test{
-			Words:  []string{"The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog", "The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog", "The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"},
-			Config: userConfig,
-		},
-        Config: &userConfig,
+		Test: test.New(userConfig),
+        Config: userConfig,
 	}, tea.WithAltScreen())
     go userConfig.MonkeyTheme.Update(app)
 
@@ -45,7 +42,6 @@ func (this model) calculateTestWidth() int {
 }
 
 func (m model) Init() tea.Cmd {
-	m.Test.Init()
 	return nil
 }
 
