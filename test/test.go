@@ -23,7 +23,7 @@ type Model struct {
 }
 
 func New(config *config.Model) *Model {
-    style = lipgloss.NewStyle().Background(config.BackgroundColor()).Bold(true)
+    style = lipgloss.NewStyle().Background(config.BackgroundColor())
     caret = config.Cursor()
     space = lipgloss.NewStyle().Background(config.BackgroundColor()).Render(" ")
 

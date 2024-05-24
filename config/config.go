@@ -128,23 +128,17 @@ func (this *Model) StyleUntyped(style lipgloss.Style, word string) lipgloss.Styl
 	} else if this.FlipTestColors {
 		foregroundColor = this.MonkeyTheme.TextColor()
 	}
-	style = style.Foreground(lipgloss.Color(foregroundColor))
-
-	return style
+	return style.Foreground(lipgloss.Color(foregroundColor))
 }
 
 func (this *Model) StyleCorrect(style lipgloss.Style, word string) lipgloss.Style {
-	style = style.SetString(word)
-
 	foregroundColor := this.MonkeyTheme.TextColor()
 	if this.FlipTestColors {
 		foregroundColor = this.MonkeyTheme.SubColor()
 	} else if this.ColorfulMode {
 		foregroundColor = this.MonkeyTheme.MainColor()
 	}
-	style = style.Foreground(lipgloss.Color(foregroundColor))
-
-	return style
+	return style.Foreground(lipgloss.Color(foregroundColor)).SetString(word)
 }
 
 func (this *Model) StyleError(style lipgloss.Style, typed, word string) lipgloss.Style {
@@ -160,11 +154,9 @@ func (this *Model) StyleError(style lipgloss.Style, typed, word string) lipgloss
 	style = style.Foreground(lipgloss.Color(foregroundColor))
 
 	if this.IndicateTypos == "replace" {
-		style = style.SetString(typed)
-		return style
+        return style.SetString(typed)
 	} else {
-		style = style.SetString(word)
-		return style
+        return style.SetString(word)
 	}
 }
 
@@ -174,13 +166,9 @@ func (this *Model) StyleErrorExtra(style lipgloss.Style, char string) lipgloss.S
 		return style
 	}
 
-	style = style.SetString(char)
-
 	foregroundColor := this.MonkeyTheme.ErrorExtraColor()
 	if this.ColorfulMode {
 		foregroundColor = this.MonkeyTheme.ColorfulErrorExtraColor()
 	}
-	style = style.Foreground(lipgloss.Color(foregroundColor))
-
-	return style
+	return style.Foreground(lipgloss.Color(foregroundColor)).SetString(char)
 }
