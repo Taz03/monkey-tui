@@ -46,6 +46,8 @@ func GenerateWords(config *config.Model) []string {
 	switch config.Mode {
 	case "time":
         return language.generateTimeTest(config.Time, nextWord)
+    case "words":
+        return language.generateWordTest(config.Words, nextWord)
 	}
 
 	return []string{}
@@ -68,6 +70,15 @@ func fetchLanguage(name string) (language languageModel) {
 func (this *languageModel) generateTimeTest(seconds int, nextWord func() string) []string {
     var generated []string
     for range seconds * WORDS_PER_SECOND {
+        generated = append(generated, nextWord())
+    }
+
+    return generated
+}
+
+func (this *languageModel) generateWordTest(words int, nextWord func() string) []string {
+    var generated []string
+    for range words {
         generated = append(generated, nextWord())
     }
 
