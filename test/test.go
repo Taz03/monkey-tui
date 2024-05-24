@@ -17,7 +17,7 @@ type Model struct {
     Width int
 
     config     *config.Model
-    words      *[]string
+    words      []string
     typedWords []string
     pos        [2]int
 }
@@ -43,7 +43,7 @@ func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     case tea.KeyMsg:
         switch msg.String() {
         case "tab":
-            *this.words = nil
+            this.words = nil
         case " ":
             this.typedWords = append(this.typedWords, "")
             this.pos[0]++
