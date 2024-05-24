@@ -27,12 +27,11 @@ type rowModel struct {
 }
 
 func (this *Model) partitionedRows() (rows []rowModel) {
-    words := *this.words
     var row rowModel
-    for i := range words {
+    for i := range this.words {
         var word string
-        if i >= len(this.typedWords) || len(words[i]) >= len(this.typedWords[i]) {
-            word = words[i]
+        if i >= len(this.typedWords) || len(this.words[i]) >= len(this.typedWords[i]) {
+            word = this.words[i]
         } else {
             word = this.typedWords[i]
         }
@@ -83,14 +82,12 @@ func (this *Model) focusedRows(rows []rowModel) (focusedRows []rowModel) {
 }
 
 func (this *Model) renderWord(i int) string {
-    words := *this.words
-
     if i >= len(this.typedWords) {
-        return this.config.StyleUntyped(style, words[i] + " ").Render()
+        return this.config.StyleUntyped(style, this.words[i] + " ").Render()
     }
 
     wordStyle := style
-    if i < this.pos[0] && words[i] != this.typedWords[i] {
+    if i < this.pos[0] && this.words[i] != this.typedWords[i] {
         wordStyle = this.config.StyleWrongWordUnderline(wordStyle)
     }
 
@@ -98,18 +95,18 @@ func (this *Model) renderWord(i int) string {
     for j, char := range this.typedWords[i] {
         str := string(char)
         switch {
-        case j >= len(words[i]):
+        case j >= len(this.words[i]):
             renderedWord.WriteString(this.config.StyleErrorExtra(wordStyle, str).Render())
-        case str != string(words[i][j]):
-            renderedWord.WriteString(this.config.StyleError(wordStyle, str, string(words[i][j])).Render())
+        case str != string(this.words[i][j]):
+            renderedWord.WriteString(this.config.StyleError(wordStyle, str, string(this.words[i][j])).Render())
         default:
             renderedWord.WriteString(this.config.StyleCorrect(wordStyle, str).Render())
         }
     }
 
     var remainingWord string
-    if len(words[i]) > len(this.typedWords[i]) {
-        remainingWord += words[i][len(this.typedWords[i]):]
+    if len(this.words[i]) > len(this.typedWords[i]) {
+        remainingWord += this.words[i][len(this.typedWords[i]):]
     }
     remainingWord += " "
 

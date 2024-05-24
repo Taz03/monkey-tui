@@ -6,12 +6,14 @@ import (
 	"math/rand"
 	"net/http"
 	"sort"
-	"time"
 
 	"github.com/taz03/monkeytui/config"
 )
 
-const BASE_URL = "https://monkeytype.com/languages/"
+const (
+    BASE_URL = "https://monkeytype.com/languages/"
+    WORDS_PER_SECOND = 50
+)
 
 type languageModel struct {
 	Name               string   `json:"name"`
@@ -21,15 +23,35 @@ type languageModel struct {
 	Words              []string `json:"words"`
 }
 
-func GenerateWords(config *config.Model) *[]string {
+func GenerateWords(config *config.Model) []string {
     language := fetchLanguage(config.Language)
+
+    n := len(language.Words)
+
+    var nextWord func() string
+    if language.OrderedByFrequency {
+
+        totalWeight, cumulativeWeights := calculateWeight(n)
+        nextWord = func() string {
+            r := rand.Intn(totalWeight)
+            // Use binary search to find the index of the chosen word
+            idx := sort.Search(n, func(i int) bool { return cumulativeWeights[i] > r })
+            return language.Words[idx]
+        }
+    } else {
+        nextWord = func() string {
+            return language.Words[rand.Intn(n)]
+        }
+    }
 
 	switch config.Mode {
 	case "time":
-        return language.generateInfiniteTest()
+        return language.generateTimeTest(config.Time, nextWord)
+    case "words":
+        return language.generateWordTest(config.Words, nextWord)
 	}
 
-	return &[]string{}
+	return []string{}
 }
 
 func fetchLanguage(name string) (language languageModel) {
@@ -46,11 +68,26 @@ func fetchLanguage(name string) (language languageModel) {
     return language
 }
 
-func (this *languageModel) generateInfiniteTest() *[]string {
-	n := len(this.Words)
+func (this *languageModel) generateTimeTest(seconds int, nextWord func() string) []string {
+    var generated []string
+    for range seconds * WORDS_PER_SECOND {
+        generated = append(generated, nextWord())
+    }
 
-    totalWeight := 0
-	cumulativeWeights := make([]int, n)
+    return generated
+}
+
+func (this *languageModel) generateWordTest(words int, nextWord func() string) []string {
+    var generated []string
+    for range words {
+        generated = append(generated, nextWord())
+    }
+
+    return generated
+}
+
+func calculateWeight(n int) (totalWeight int, cumulativeWeights []int) {
+	cumulativeWeights = make([]int, n)
 	for i := 0; i < n; i++ {
 		weight := (i + 1) * (n - i)
 		totalWeight += weight
@@ -61,27 +98,5 @@ func (this *languageModel) generateInfiniteTest() *[]string {
 		}
 	}
 
-    var generated []string
-
-    appendRandomWord := func() {
-        r := rand.Intn(totalWeight)
-        // Use binary search to find the index of the chosen word
-        idx := sort.Search(n, func(i int) bool { return cumulativeWeights[i] > r })
-        generated = append(generated, this.Words[idx])
-    }
-
-    for range 50 {
-        appendRandomWord()
-    }
-
-    var delay time.Duration = 100
-    go func() {
-        for {
-            appendRandomWord()
-            delay += 10
-            time.Sleep(delay * time.Millisecond)
-        }
-    }()
-
-    return &generated
+    return
 }
