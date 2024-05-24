@@ -26,9 +26,10 @@ type languageModel struct {
 func GenerateWords(config *config.Model) []string {
     language := fetchLanguage(config.Language)
 
+    n := len(language.Words)
+
     var nextWord func() string
     if language.OrderedByFrequency {
-        n := len(language.Words)
 
         totalWeight, cumulativeWeights := calculateWeight(n)
         nextWord = func() string {
@@ -39,7 +40,7 @@ func GenerateWords(config *config.Model) []string {
         }
     } else {
         nextWord = func() string {
-            return language.Words[rand.Intn(len(language.Words))]
+            return language.Words[rand.Intn(n)]
         }
     }
 
