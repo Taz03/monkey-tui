@@ -12,7 +12,7 @@ import (
 
 const (
     BASE_URL = "https://monkeytype.com/languages/"
-    WORDS_PER_SECOND = 50
+    INIT_WORDS = 100
 )
 
 type languageModel struct {
@@ -23,15 +23,33 @@ type languageModel struct {
 	Words              []string `json:"words"`
 }
 
-func GenerateWords(config *config.Model) []string {
+type Command string
+
+// Commands
+const (
+    ADD_WORD Command = "add_word"
+    STOP     Command = "stop"
+)
+
+func GenerateWords(config *config.Model, cmd chan Command) *[]string {
     language := fetchLanguage(config.Language)
 
     n := len(language.Words)
 
     var nextWord func() string
     if language.OrderedByFrequency {
+        var totalWeight int
+        cumulativeWeights := make([]int, n)
+        for i := 0; i < n; i++ {
+            weight := (i + 1) * (n - i)
+            totalWeight += weight
+            if i == 0 {
+                cumulativeWeights[i] = weight
+            } else {
+                cumulativeWeights[i] = cumulativeWeights[i-1] + weight
+            }
+        }
 
-        totalWeight, cumulativeWeights := calculateWeight(n)
         nextWord = func() string {
             r := rand.Intn(totalWeight)
             // Use binary search to find the index of the chosen word
@@ -46,12 +64,12 @@ func GenerateWords(config *config.Model) []string {
 
 	switch config.Mode {
 	case "time":
-        return language.generateTimeTest(config.Time, nextWord)
+        return language.generateTimeTest(nextWord, cmd)
     case "words":
-        return language.generateWordTest(config.Words, nextWord)
+        return language.generateWordTest(nextWord, config.Words, cmd)
 	}
 
-	return []string{}
+	return &[]string{}
 }
 
 func fetchLanguage(name string) (language languageModel) {
@@ -68,35 +86,39 @@ func fetchLanguage(name string) (language languageModel) {
     return language
 }
 
-func (this *languageModel) generateTimeTest(seconds int, nextWord func() string) []string {
+func (this *languageModel) generateTimeTest(nextWord func() string, cmd chan Command) *[]string {
     var generated []string
-    for range seconds * WORDS_PER_SECOND {
+    for range INIT_WORDS {
         generated = append(generated, nextWord())
     }
 
-    return generated
+    go commandHandler(cmd, &generated, nextWord)
+    return &generated
 }
 
-func (this *languageModel) generateWordTest(words int, nextWord func() string) []string {
+func (this *languageModel) generateWordTest(nextWord func() string, words int, cmd chan Command) *[]string {
     var generated []string
-    for range words {
+
+    wordsToGenerate := words
+    if words == 0 {
+        wordsToGenerate = INIT_WORDS
+    }
+
+    for range wordsToGenerate {
         generated = append(generated, nextWord())
     }
 
-    return generated
+    go commandHandler(cmd, &generated, nextWord)
+    return &generated
 }
 
-func calculateWeight(n int) (totalWeight int, cumulativeWeights []int) {
-	cumulativeWeights = make([]int, n)
-	for i := 0; i < n; i++ {
-		weight := (i + 1) * (n - i)
-		totalWeight += weight
-		if i == 0 {
-			cumulativeWeights[i] = weight
-		} else {
-			cumulativeWeights[i] = cumulativeWeights[i-1] + weight
-		}
-	}
-
-    return
+func commandHandler(cmd chan Command, generated *[]string, nextWord func() string) {
+    for {
+        switch <-cmd {
+        case ADD_WORD:
+            *generated = append(*generated, nextWord())
+        case STOP:
+            return
+        }
+    }
 }
