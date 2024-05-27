@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/charmbracelet/bubbles/timer"
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/taz03/monkeytui/config"
@@ -50,10 +51,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		width, height = msg.Width, msg.Height
         m.Test.Width = m.calculateTestWidth()
+    case timer.TickMsg:
+        m.Test.Update(msg)
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c":
+		case tea.KeyCtrlC.String():
 			return m, tea.Quit
+        case tea.KeyShiftTab.String():
+            m.Test = test.New(m.Config)
+            return m, nil
 		default:
 			m.Test.Update(msg)
 		}

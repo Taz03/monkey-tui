@@ -1,6 +1,8 @@
 package test
 
 import (
+	"time"
+
 	"github.com/charmbracelet/bubbles/cursor"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -20,6 +22,8 @@ type Model struct {
     words      []string
     typedWords []string
     pos        [2]int
+    started    bool
+    startTime  time.Time
 }
 
 func New(config *config.Model) *Model {
@@ -42,14 +46,12 @@ func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     switch msg := msg.(type) {
     case tea.KeyMsg:
         switch msg.String() {
-        case "tab":
-            this.words = nil
-        case " ":
+        case tea.KeySpace.String():
             this.typedWords = append(this.typedWords, "")
             this.pos[0]++
             this.pos[1] = 0
 
-        case "backspace":
+        case tea.KeyBackspace.String():
             if this.pos[1]--; this.pos[1] < 0 {
                 if this.pos[0] > 0 {
                     this.pos[0]--
@@ -61,6 +63,11 @@ func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             }
 
         default:
+            if !this.started {
+                this.startTime = time.Now()
+                this.started = true
+            }
+
             this.typedWords[len(this.typedWords) - 1] += msg.String()
             this.pos[1]++
         }
