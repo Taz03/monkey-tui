@@ -23,15 +23,7 @@ type languageModel struct {
 	Words              []string `json:"words"`
 }
 
-type Command string
-
-// Commands
-const (
-    ADD_WORD Command = "add_word"
-    STOP     Command = "stop"
-)
-
-func GenerateWords(config *config.Model, cmd chan Command) *[]string {
+func GenerateWords(config *config.Model, cmd chan struct{}) *[]string {
     language := fetchLanguage(config.Language)
 
     n := len(language.Words)
@@ -86,7 +78,7 @@ func fetchLanguage(name string) (language languageModel) {
     return language
 }
 
-func (this *languageModel) generateTimeTest(nextWord func() string, cmd chan Command) *[]string {
+func (this *languageModel) generateTimeTest(nextWord func() string, cmd chan struct{}) *[]string {
     var generated []string
     for range INIT_WORDS {
         generated = append(generated, nextWord())
@@ -96,7 +88,7 @@ func (this *languageModel) generateTimeTest(nextWord func() string, cmd chan Com
     return &generated
 }
 
-func (this *languageModel) generateWordTest(nextWord func() string, words int, cmd chan Command) *[]string {
+func (this *languageModel) generateWordTest(nextWord func() string, words int, cmd chan struct{}) *[]string {
     var generated []string
 
     wordsToGenerate := words
@@ -112,13 +104,8 @@ func (this *languageModel) generateWordTest(nextWord func() string, words int, c
     return &generated
 }
 
-func commandHandler(cmd chan Command, generated *[]string, nextWord func() string) {
-    for {
-        switch <-cmd {
-        case ADD_WORD:
-            *generated = append(*generated, nextWord())
-        case STOP:
-            return
-        }
+func commandHandler(cmd chan struct{}, generated *[]string, nextWord func() string) {
+    for range cmd {
+        *generated = append(*generated, nextWord())
     }
 }

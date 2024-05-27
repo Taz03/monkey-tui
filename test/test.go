@@ -21,7 +21,7 @@ type Model struct {
     config *config.Model
 
     words            *[]string
-    wordsController  chan Command
+    wordsController  chan struct{}
 
     typedWords []string
     pos        [2]int
@@ -35,7 +35,7 @@ func New(config *config.Model) *Model {
     caret = config.Cursor()
     space = lipgloss.NewStyle().Background(config.BackgroundColor()).Render(" ")
 
-    wordsController := make(chan Command)
+    wordsController := make(chan struct{})
 
     return &Model{
         config:          config,
@@ -55,7 +55,7 @@ func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
         switch msg.String() {
         case tea.KeySpace.String():
             this.typedWords = append(this.typedWords, "")
-            this.wordsController <- ADD_WORD
+            this.wordsController <- struct{}{}
             this.pos[0]++
             this.pos[1] = 0
 
