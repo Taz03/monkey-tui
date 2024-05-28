@@ -20,8 +20,8 @@ type Model struct {
 
     config *config.Model
 
-    words            *[]string
-    wordsController  chan struct{}
+    words   *[]string
+    addWord chan bool
 
     typedWords []string
     pos        [2]int
@@ -35,13 +35,13 @@ func New(config *config.Model) *Model {
     caret = config.Cursor()
     space = lipgloss.NewStyle().Background(config.BackgroundColor()).Render(" ")
 
-    wordsController := make(chan struct{})
+    wordsController := make(chan bool)
 
     return &Model{
-        config:          config,
-        words:           GenerateWords(config, wordsController),
-        wordsController: wordsController,
-        typedWords:      []string{""},
+        config:     config,
+        words:      GenerateWords(config, wordsController),
+        addWord:    wordsController,
+        typedWords: []string{""},
     }
 }
 
@@ -55,7 +55,7 @@ func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
         switch msg.String() {
         case tea.KeySpace.String():
             this.typedWords = append(this.typedWords, "")
-            this.wordsController <- struct{}{}
+            this.addWord <- true
             this.pos[0]++
             this.pos[1] = 0
 
