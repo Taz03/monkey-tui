@@ -82,32 +82,30 @@ func (language *languageModel) nextWordFunc() func() string {
 }
 
 func generateTimeTest(nextWord func() string, pulse chan bool) *[]string {
-    var generated []string
-    for range INIT_WORDS {
-        generated = append(generated, nextWord())
-    }
-
-    go commandHandler(pulse, &generated, nextWord)
-    return &generated
+    return initAndContinue(INIT_WORDS, pulse, nextWord)
 }
 
 func generateWordTest(nextWord func() string, pulse chan bool, words int) *[]string {
-    var generated []string
-
     wordsToGenerate := words
     if words == 0 {
         wordsToGenerate = INIT_WORDS
     }
 
-    for range wordsToGenerate {
+    return initAndContinue(wordsToGenerate, pulse, nextWord)
+}
+
+func initAndContinue(initWords int, pulse chan bool, nextWord func() string) *[]string {
+    var generated []string
+
+    for range initWords {
         generated = append(generated, nextWord())
     }
 
-    go commandHandler(pulse, &generated, nextWord)
+    go continiousGenerator(pulse, &generated, nextWord)
     return &generated
 }
 
-func commandHandler(pulse chan bool, generated *[]string, nextWord func() string) {
+func continiousGenerator(pulse chan bool, generated *[]string, nextWord func() string) {
     for range pulse {
         *generated = append(*generated, nextWord())
     }
