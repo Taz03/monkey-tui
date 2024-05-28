@@ -22,17 +22,17 @@ type RGBTheme struct {
 
 var interpolatedColors []string
 
-func (this *RGBTheme) Init() {
-    this.backgroundColor = "#111"
-    this.mainColor = "#eee"
-    this.caretColor = "#eee"
-    this.subColor = "#444"
-    this.subAltColor = "#1a1a1a"
-    this.textColor = "#eee"
-    this.errorColor = "#eee"
-    this.errorExtraColor = "#b3b3b3"
-    this.colorfulErrorColor = "#eee"
-    this.colorfulErrorExtraColor = "#b3b3b3"
+func (rgb *RGBTheme) Init() {
+    rgb.backgroundColor = "#111"
+    rgb.mainColor = "#eee"
+    rgb.caretColor = "#eee"
+    rgb.subColor = "#444"
+    rgb.subAltColor = "#1a1a1a"
+    rgb.textColor = "#eee"
+    rgb.errorColor = "#eee"
+    rgb.errorExtraColor = "#b3b3b3"
+    rgb.colorfulErrorColor = "#eee"
+    rgb.colorfulErrorExtraColor = "#b3b3b3"
 
     c1 := RGB{76, 174, 76}
     c2 := RGB{64, 158, 181}
@@ -52,51 +52,51 @@ func (this *RGBTheme) Init() {
     interpolatedColors = append(interpolatedColors, InterpolateColor(c2, c1, 25)...)
 }
 
-func (this *RGBTheme) BackgroundColor() string {
-    return this.backgroundColor
+func (rgb *RGBTheme) BackgroundColor() string {
+    return rgb.backgroundColor
 }
 
-func (this *RGBTheme) MainColor() string {
-    return this.mainColor
+func (rgb *RGBTheme) MainColor() string {
+    return rgb.mainColor
 }
 
-func (this *RGBTheme) CaretColor() string {
-    return this.caretColor
+func (rgb *RGBTheme) CaretColor() string {
+    return rgb.caretColor
 }
 
-func (this *RGBTheme) SubColor() string {
-    return this.subColor
+func (rgb *RGBTheme) SubColor() string {
+    return rgb.subColor
 }
 
-func (this *RGBTheme) SubAltColor() string {
-    return this.subAltColor
+func (rgb *RGBTheme) SubAltColor() string {
+    return rgb.subAltColor
 }
 
-func (this *RGBTheme) TextColor() string {
-    return this.textColor
+func (rgb *RGBTheme) TextColor() string {
+    return rgb.textColor
 }
 
-func (this *RGBTheme) ErrorColor() string {
-    return this.errorColor
+func (rgb *RGBTheme) ErrorColor() string {
+    return rgb.errorColor
 }
 
-func (this *RGBTheme) ErrorExtraColor() string {
-    return this.errorExtraColor
+func (rgb *RGBTheme) ErrorExtraColor() string {
+    return rgb.errorExtraColor
 }
 
-func (this *RGBTheme) ColorfulErrorColor() string {
-    return this.colorfulErrorColor
+func (rgb *RGBTheme) ColorfulErrorColor() string {
+    return rgb.colorfulErrorColor
 }
 
-func (this *RGBTheme) ColorfulErrorExtraColor() string {
-    return this.colorfulErrorExtraColor
+func (rgb *RGBTheme) ColorfulErrorExtraColor() string {
+    return rgb.colorfulErrorExtraColor
 }
 
-func (this *RGBTheme) Update(app *tea.Program) {
+func (rgb *RGBTheme) Update(app *tea.Program) {
     for {
         for _, color := range interpolatedColors {
-            this.mainColor = color
-            this.textColor = color
+            rgb.mainColor = color
+            rgb.textColor = color
 
             app.Send(color)
             time.Sleep(time.Millisecond * 25)

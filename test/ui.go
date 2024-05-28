@@ -2,18 +2,18 @@ package test
 
 import "strings"
 
-func (this *Model) View() string {
-    rows := this.focusedRows(this.partitionedRows())
+func (m *Model) View() string {
+    rows := m.focusedRows(m.partitionedRows())
 
     var renderedRows []string
     for _, row := range rows {
         renderedRow := strings.Builder{}
         for _, index := range row.indices {
-            renderedRow.WriteString(this.renderWord(index))
+            renderedRow.WriteString(m.renderWord(index))
         }
 
-        if this.Width > row.length {
-            renderedRow.WriteString(strings.Repeat(space, this.Width - row.length))
+        if m.Width > row.length {
+            renderedRow.WriteString(strings.Repeat(space, m.Width - row.length))
         }
         renderedRows = append(renderedRows, renderedRow.String())
     }
@@ -26,20 +26,20 @@ type rowModel struct {
     indices []int
 }
 
-func (this *Model) partitionedRows() (rows []rowModel) {
-    words := *this.words
+func (m *Model) partitionedRows() (rows []rowModel) {
+    words := *m.words
 
     var row rowModel
     for i := range words {
         var word string
-        if i >= len(this.typedWords) || len(words[i]) >= len(this.typedWords[i]) {
+        if i >= len(m.typedWords) || len(words[i]) >= len(m.typedWords[i]) {
             word = words[i]
         } else {
-            word = this.typedWords[i]
+            word = m.typedWords[i]
         }
         
         wordLen := len(word) + 1
-        if row.length + wordLen <= this.Width {
+        if row.length + wordLen <= m.Width {
             row.length += wordLen
             row.indices = append(row.indices, i)
         } else {
@@ -57,10 +57,10 @@ func (this *Model) partitionedRows() (rows []rowModel) {
     return
 }
 
-func (this *Model) focusedRows(rows []rowModel) (focusedRows []rowModel) {
+func (m *Model) focusedRows(rows []rowModel) (focusedRows []rowModel) {
     for i, row := range rows {
         for _, index := range row.indices {
-            if this.pos[0] == index {
+            if m.pos[0] == index {
                 if i == 0 {
                     for i := 0; len(rows) > i && i < 3; i++ {
                         focusedRows = append(focusedRows, rows[i])
@@ -83,39 +83,39 @@ func (this *Model) focusedRows(rows []rowModel) (focusedRows []rowModel) {
     return
 }
 
-func (this *Model) renderWord(i int) string {
-    words := *this.words
+func (m *Model) renderWord(i int) string {
+    words := *m.words
 
-    if i >= len(this.typedWords) {
-        return this.config.StyleUntyped(style, words[i] + " ").Render()
+    if i >= len(m.typedWords) {
+        return m.config.StyleUntyped(style, words[i] + " ").Render()
     }
 
     wordStyle := style
-    if i < this.pos[0] && words[i] != this.typedWords[i] {
-        wordStyle = this.config.StyleWrongWordUnderline(wordStyle)
+    if i < m.pos[0] && words[i] != m.typedWords[i] {
+        wordStyle = m.config.StyleWrongWordUnderline(wordStyle)
     }
 
     var renderedWord strings.Builder
-    for j, char := range this.typedWords[i] {
+    for j, char := range m.typedWords[i] {
         str := string(char)
         switch {
         case j >= len(words[i]):
-            renderedWord.WriteString(this.config.StyleErrorExtra(wordStyle, str).Render())
+            renderedWord.WriteString(m.config.StyleErrorExtra(wordStyle, str).Render())
         case str != string(words[i][j]):
-            renderedWord.WriteString(this.config.StyleError(wordStyle, str, string(words[i][j])).Render())
+            renderedWord.WriteString(m.config.StyleError(wordStyle, str, string(words[i][j])).Render())
         default:
-            renderedWord.WriteString(this.config.StyleCorrect(wordStyle, str).Render())
+            renderedWord.WriteString(m.config.StyleCorrect(wordStyle, str).Render())
         }
     }
 
     var remainingWord string
-    if len(words[i]) > len(this.typedWords[i]) {
-        remainingWord += words[i][len(this.typedWords[i]):]
+    if len(words[i]) > len(m.typedWords[i]) {
+        remainingWord += words[i][len(m.typedWords[i]):]
     }
     remainingWord += " "
 
-    if i < this.pos[0] {
-        renderedWord.WriteString(this.config.StyleUntyped(wordStyle, remainingWord).Render())
+    if i < m.pos[0] {
+        renderedWord.WriteString(m.config.StyleUntyped(wordStyle, remainingWord).Render())
 
         return renderedWord.String()
     }
@@ -123,7 +123,7 @@ func (this *Model) renderWord(i int) string {
     caret.SetChar(string(remainingWord[0]))
     renderedWord.WriteString(caret.View())
 
-    renderedWord.WriteString(this.config.StyleUntyped(wordStyle, remainingWord[1:]).Render())
+    renderedWord.WriteString(m.config.StyleUntyped(wordStyle, remainingWord[1:]).Render())
 
     return renderedWord.String()
 }

@@ -45,41 +45,41 @@ func New(config *config.Model) *Model {
     }
 }
 
-func (this *Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
     return nil
 }
 
-func (this *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     switch msg := msg.(type) {
     case tea.KeyMsg:
         switch msg.String() {
         case tea.KeySpace.String():
-            this.typedWords = append(this.typedWords, "")
-            this.addWord <- true
-            this.pos[0]++
-            this.pos[1] = 0
+            m.typedWords = append(m.typedWords, "")
+            m.addWord <- true
+            m.pos[0]++
+            m.pos[1] = 0
 
         case tea.KeyBackspace.String():
-            if this.pos[1]--; this.pos[1] < 0 {
-                if this.pos[0] > 0 {
-                    this.pos[0]--
-                    this.typedWords = this.typedWords[:len(this.typedWords) - 1]
+            if m.pos[1]--; m.pos[1] < 0 {
+                if m.pos[0] > 0 {
+                    m.pos[0]--
+                    m.typedWords = m.typedWords[:len(m.typedWords) - 1]
                 }
-                this.pos[1] = len(this.typedWords[this.pos[0]])
+                m.pos[1] = len(m.typedWords[m.pos[0]])
             } else {
-                this.typedWords[this.pos[0]] = this.typedWords[this.pos[0]][:this.pos[1]]
+                m.typedWords[m.pos[0]] = m.typedWords[m.pos[0]][:m.pos[1]]
             }
 
         default:
-            if !this.started {
-                this.startTime = time.Now()
-                this.started = true
+            if !m.started {
+                m.startTime = time.Now()
+                m.started = true
             }
 
-            this.typedWords[len(this.typedWords) - 1] += msg.String()
-            this.pos[1]++
+            m.typedWords[len(m.typedWords) - 1] += msg.String()
+            m.pos[1]++
         }
     }
 
-    return this, nil
+    return m, nil
 }

@@ -34,7 +34,7 @@ func GetStaticTheme(themeName string) Theme {
     bodySlice, _ := io.ReadAll(response.Body)
 	body := string(bodySlice)
 
-    val := &StaticPreset{
+    return &StaticPreset{
 		backgroundColor:         readColor(body, "bg-color"),
 		mainColor:               readColor(body, "main-color"),
 		caretColor:              readColor(body, "caret-color"),
@@ -46,8 +46,6 @@ func GetStaticTheme(themeName string) Theme {
 		colorfulErrorColor:      readColor(body, "colorful-error-color"),
 		colorfulErrorExtraColor: readColor(body, "colorful-error-extra-color"),
 	}
-
-    return val
 }
 
 func readColor(body, name string) string {
@@ -55,44 +53,44 @@ func readColor(body, name string) string {
 	return colorRegex.FindStringSubmatch(body)[1]
 }
 
-func (this *StaticPreset) BackgroundColor() string {
-	return this.backgroundColor
+func (static *StaticPreset) BackgroundColor() string {
+	return static.backgroundColor
 }
 
-func (this *StaticPreset) MainColor() string {
-	return this.mainColor
+func (static *StaticPreset) MainColor() string {
+	return static.mainColor
 }
 
-func (this *StaticPreset) CaretColor() string {
-	return this.caretColor
+func (static *StaticPreset) CaretColor() string {
+	return static.caretColor
 }
 
-func (this *StaticPreset) SubColor() string {
-	return this.subColor
+func (static *StaticPreset) SubColor() string {
+	return static.subColor
 }
 
-func (this *StaticPreset) SubAltColor() string {
-	return this.subAltColor
+func (static *StaticPreset) SubAltColor() string {
+	return static.subAltColor
 }
 
-func (this *StaticPreset) TextColor() string {
-	return this.textColor
+func (static *StaticPreset) TextColor() string {
+	return static.textColor
 }
 
-func (this *StaticPreset) ErrorColor() string {
-	return this.errorColor
+func (static *StaticPreset) ErrorColor() string {
+	return static.errorColor
 }
 
-func (this *StaticPreset) ErrorExtraColor() string {
-	return this.errorExtraColor
+func (static *StaticPreset) ErrorExtraColor() string {
+	return static.errorExtraColor
 }
 
-func (this *StaticPreset) ColorfulErrorColor() string {
-	return this.colorfulErrorColor
+func (static *StaticPreset) ColorfulErrorColor() string {
+	return static.colorfulErrorColor
 }
 
-func (this *StaticPreset) ColorfulErrorExtraColor() string {
-	return this.colorfulErrorExtraColor
+func (static *StaticPreset) ColorfulErrorExtraColor() string {
+	return static.colorfulErrorExtraColor
 }
 
 func (_ *StaticPreset) Init() {}

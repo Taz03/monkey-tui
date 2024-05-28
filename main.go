@@ -30,16 +30,16 @@ func main() {
 	app.Run()
 }
 
-func (this model) calculateTestWidth() int {
-    if this.Config.MaxLineWidth == 0 {
+func (m model) calculateTestWidth() int {
+    if m.Config.MaxLineWidth == 0 {
         return width - 10
     }
     
-    if this.Config.MaxLineWidth > width {
+    if m.Config.MaxLineWidth > width {
         return width
     }
 
-    return this.Config.MaxLineWidth
+    return m.Config.MaxLineWidth
 }
 
 func (m model) Init() tea.Cmd {
