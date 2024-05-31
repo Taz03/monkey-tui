@@ -54,12 +54,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     case timer.TickMsg:
         m.Test.Update(msg)
 	case tea.KeyMsg:
+        if msg.String() == m.Config.RestartKey() {
+            m.Test = test.New(m.Config)
+            m.Test.Width = m.calculateTestWidth()
+            return m, nil
+        }
+
 		switch msg.String() {
 		case tea.KeyCtrlC.String():
 			return m, tea.Quit
-        case tea.KeyShiftTab.String():
-            m.Test = test.New(m.Config)
-            return m, nil
 		default:
 			m.Test.Update(msg)
 		}
