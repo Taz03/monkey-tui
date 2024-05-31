@@ -55,7 +55,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
         switch msg.String() {
         case tea.KeySpace.String():
             m.typedWords = append(m.typedWords, "")
-            m.addWord <- true
+            if !(m.config.Mode == "words" && m.config.Words != 0) {
+                m.addWord <- true
+            }
             m.pos[0]++
             m.pos[1] = 0
 

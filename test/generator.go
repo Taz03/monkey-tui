@@ -64,7 +64,7 @@ func (language *languageModel) nextWordFunc() func() string {
             if i == 0 {
                 cumulativeWeights[i] = weight
             } else {
-                cumulativeWeights[i] = cumulativeWeights[i-1] + weight
+                cumulativeWeights[i] = cumulativeWeights[i - 1] + weight
             }
         }
 
@@ -82,7 +82,10 @@ func (language *languageModel) nextWordFunc() func() string {
 }
 
 func generateTimeTest(nextWord func() string, pulse chan bool) *[]string {
-    return initAndContinue(INIT_WORDS, pulse, nextWord)
+    generated := initialGenerator(INIT_WORDS, nextWord)
+
+    go continiousGenerator(pulse, generated, nextWord)
+    return generated
 }
 
 func generateWordTest(nextWord func() string, pulse chan bool, words int) *[]string {
@@ -91,17 +94,22 @@ func generateWordTest(nextWord func() string, pulse chan bool, words int) *[]str
         wordsToGenerate = INIT_WORDS
     }
 
-    return initAndContinue(wordsToGenerate, pulse, nextWord)
+    generated := initialGenerator(wordsToGenerate, nextWord)
+
+    if words == 0 {
+        go continiousGenerator(pulse, generated, nextWord)
+    }
+
+    return generated
 }
 
-func initAndContinue(initWords int, pulse chan bool, nextWord func() string) *[]string {
+func initialGenerator(words int, nextWord func() string) *[]string {
     var generated []string
 
-    for range initWords {
+    for range words {
         generated = append(generated, nextWord())
     }
 
-    go continiousGenerator(pulse, &generated, nextWord)
     return &generated
 }
 
