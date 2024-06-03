@@ -82,3 +82,18 @@ func (m *Model) StyleErrorExtra(style lipgloss.Style, char string) lipgloss.Styl
 	}
 	return style.Foreground(lipgloss.Color(foregroundColor)).SetString(char)
 }
+
+func (m *Model) LiveStatsColor() string {
+    switch m.TimerColor {
+    case "black":
+        return "0"
+    case "sub":
+        return m.MonkeyTheme.SubColor()
+    case "text":
+        return m.MonkeyTheme.TextColor()
+    case "main":
+        return m.MonkeyTheme.MainColor()
+    default:
+        return ""
+    }
+}
