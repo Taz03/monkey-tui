@@ -9,33 +9,33 @@ import (
 
 type model struct {
 	Test   *test.Model
-    Config *config.Model
+	Config *config.Model
 }
 
 var width, height int
 
 func main() {
-    userConfig := config.New("config.json")
+	userConfig := config.New("config.json")
 
 	app := tea.NewProgram(model{
-		Test: test.New(userConfig),
-        Config: userConfig,
+		Test:   test.New(userConfig),
+		Config: userConfig,
 	}, tea.WithAltScreen())
-    go userConfig.MonkeyTheme.Update(app)
+	go userConfig.MonkeyTheme.Update(app)
 
 	app.Run()
 }
 
 func (m model) calculateTestWidth() int {
-    if m.Config.MaxLineWidth == 0 {
-        return width - 10
-    }
-    
-    if m.Config.MaxLineWidth > width {
-        return width
-    }
+	if m.Config.MaxLineWidth == 0 {
+		return width - 10
+	}
 
-    return m.Config.MaxLineWidth
+	if m.Config.MaxLineWidth > width {
+		return width
+	}
+
+	return m.Config.MaxLineWidth
 }
 
 func (m model) Init() tea.Cmd {
@@ -48,11 +48,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		width, height = msg.Width, msg.Height
 
 	case tea.KeyMsg:
-        if msg.String() == m.Config.RestartKey() {
-            m.Test = test.New(m.Config)
-            m.Test.Width = m.calculateTestWidth()
-            return m, m.Test.Init()
-        }
+		if msg.String() == m.Config.RestartKey() {
+			m.Test = test.New(m.Config)
+			m.Test.Width = m.calculateTestWidth()
+			return m, m.Test.Init()
+		}
 
 		switch msg.String() {
 		case tea.KeyCtrlC.String():
@@ -60,24 +60,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-    _, cmd := m.Test.Update(msg)
+	_, cmd := m.Test.Update(msg)
 	return m, cmd
 }
 
 func (m model) View() string {
-    m.Test.Width = m.calculateTestWidth()
-    m.Test.ProgressBar.Width = width
+	m.Test.Width = m.calculateTestWidth()
+	m.Test.ProgressBar.Width = width
 
-    return lipgloss.JoinVertical(
-        lipgloss.Left,
-        m.Test.ProgressBar.View(),
-        lipgloss.Place(
-            width,
-            height - 1,
-            lipgloss.Center,
-            lipgloss.Center,
-            m.Test.View(),
-            lipgloss.WithWhitespaceBackground(m.Config.BackgroundColor()),
-        ),
-    )
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		m.Test.ProgressBar.View(),
+		lipgloss.Place(
+			width,
+			height-1,
+			lipgloss.Center,
+			lipgloss.Center,
+			m.Test.View(),
+			lipgloss.WithWhitespaceBackground(m.Config.BackgroundColor()),
+		),
+	)
 }

@@ -26,4 +26,3 @@ func InterpolateColor(color1, color2 RGB, steps int) []string {
 
 	return interpolatedColors
 }
-

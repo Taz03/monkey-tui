@@ -31,10 +31,10 @@ func GetStaticTheme(themeName string) Theme {
 
 	defer response.Body.Close()
 
-    bodySlice, _ := io.ReadAll(response.Body)
+	bodySlice, _ := io.ReadAll(response.Body)
 	body := string(bodySlice)
 
-    return &StaticPreset{
+	return &StaticPreset{
 		backgroundColor:         readColor(body, "bg-color"),
 		mainColor:               readColor(body, "main-color"),
 		caretColor:              readColor(body, "caret-color"),
@@ -49,7 +49,7 @@ func GetStaticTheme(themeName string) Theme {
 }
 
 func readColor(body, name string) string {
-    colorRegex := regexp.MustCompile(fmt.Sprintf("--%s: (#.{6})", name))
+	colorRegex := regexp.MustCompile(fmt.Sprintf("--%s: (#.{6})", name))
 	return colorRegex.FindStringSubmatch(body)[1]
 }
 
@@ -93,5 +93,5 @@ func (static *StaticPreset) ColorfulErrorExtraColor() string {
 	return static.colorfulErrorExtraColor
 }
 
-func (_ *StaticPreset) Init() {}
+func (_ *StaticPreset) Init()                 {}
 func (_ *StaticPreset) Update(_ *tea.Program) {}

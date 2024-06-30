@@ -26,7 +26,7 @@ func (m *Model) StyleWrongWordUnderline(style lipgloss.Style) lipgloss.Style {
 		return style.UnsetUnderline()
 	}
 
-    return style.Underline(true).UnderlineSpaces(false)
+	return style.Underline(true).UnderlineSpaces(false)
 }
 
 func (m *Model) StyleUntyped(style lipgloss.Style, word string) lipgloss.Style {
@@ -64,9 +64,9 @@ func (m *Model) StyleError(style lipgloss.Style, typed, word string) lipgloss.St
 	style = style.Foreground(lipgloss.Color(foregroundColor))
 
 	if m.IndicateTypos == "replace" {
-        return style.SetString(typed)
+		return style.SetString(typed)
 	} else {
-        return style.SetString(word)
+		return style.SetString(word)
 	}
 }
 
@@ -84,16 +84,16 @@ func (m *Model) StyleErrorExtra(style lipgloss.Style, char string) lipgloss.Styl
 }
 
 func (m *Model) LiveStatsColor() string {
-    switch m.TimerColor {
-    case "black":
-        return "0"
-    case "sub":
-        return m.MonkeyTheme.SubColor()
-    case "text":
-        return m.MonkeyTheme.TextColor()
-    case "main":
-        return m.MonkeyTheme.MainColor()
-    default:
-        return ""
-    }
+	switch m.TimerColor {
+	case "black":
+		return "0"
+	case "sub":
+		return m.MonkeyTheme.SubColor()
+	case "text":
+		return m.MonkeyTheme.TextColor()
+	case "main":
+		return m.MonkeyTheme.MainColor()
+	default:
+		return ""
+	}
 }
