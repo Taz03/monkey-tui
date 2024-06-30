@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/bubbles/cursor"
+	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/taz03/monkeytui/config"
@@ -16,9 +17,12 @@ var (
 )
 
 type Model struct {
-    Width int
-
     config *config.Model
+
+    ProgressBar progress.Model
+    Statistics  string
+
+    Width int
 
     words   *[]string
     addWord chan bool
@@ -37,20 +41,70 @@ func New(config *config.Model) *Model {
 
     wordsController := make(chan bool)
 
-    return &Model{
+    m := &Model{
         config:     config,
         words:      GenerateWords(config, wordsController),
         addWord:    wordsController,
         typedWords: []string{""},
     }
+
+    if config.TimerStyle == "bar" {
+        m.ProgressBar = progress.New(
+            progress.WithSolidFill(config.LiveStatsColor()),
+            progress.WithoutPercentage(),
+        )
+        m.ProgressBar.Full = '▀'
+        m.ProgressBar.Empty = ' '
+
+        m.ProgressBar.EmptyColor = m.config.MonkeyTheme.BackgroundColor()
+
+        if config.Mode == "time" {
+            m.ProgressBar.SetPercent(1)
+        }
+    }
+
+    return m
 }
 
 func (m *Model) Init() tea.Cmd {
-    return nil
+    return tickCmd()
+}
+
+func tickCmd() tea.Cmd {
+    return tea.Tick(time.Millisecond * 50, func(t time.Time) tea.Msg {
+        return t
+    })
+}
+
+func (m *Model) calculateTestWidth(width int) int {
+    if m.config.MaxLineWidth == 0 {
+        return width - 10
+    }
+
+    if m.config.MaxLineWidth > width {
+        return width
+    }
+
+    return m.config.MaxLineWidth
+}
+
+func (m *Model) calculateProgressPercentage() float64 {
+    if !m.started {
+        return 0
+    }
+
+    if m.config.Mode == "time" {
+        return (float64(m.config.Time) - float64(time.Now().Sub(m.startTime).Seconds())) / float64(m.config.Time)
+    }
+
+    return float64(len(m.typedWords)) / float64(len(*m.words))
 }
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     switch msg := msg.(type) {
+    case time.Time:
+        return m, tea.Batch(tickCmd(), m.ProgressBar.SetPercent(m.calculateProgressPercentage()))
+
     case tea.KeyMsg:
         switch msg.String() {
         case tea.KeySpace.String():
@@ -81,6 +135,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             m.typedWords[len(m.typedWords) - 1] += msg.String()
             m.pos[1]++
         }
+
+    case progress.FrameMsg:
+        progressModel, cmd := m.ProgressBar.Update(msg)
+		m.ProgressBar = progressModel.(progress.Model)
+		return m, cmd
     }
 
     return m, nil
