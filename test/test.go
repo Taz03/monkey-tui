@@ -67,7 +67,13 @@ func New(config *config.Model) *Model {
 }
 
 func (m *Model) Init() tea.Cmd {
-    return nil
+    return tickCmd()
+}
+
+func tickCmd() tea.Cmd {
+    return tea.Tick(time.Millisecond * 50, func(t time.Time) tea.Msg {
+        return t
+    })
 }
 
 func (m *Model) calculateTestWidth(width int) int {
@@ -82,8 +88,23 @@ func (m *Model) calculateTestWidth(width int) int {
     return m.config.MaxLineWidth
 }
 
+func (m *Model) calculateProgressPercentage() float64 {
+    if !m.started {
+        return 0
+    }
+
+    if m.config.Mode == "time" {
+        return (float64(m.config.Time) - float64(time.Now().Sub(m.startTime).Seconds())) / float64(m.config.Time)
+    }
+
+    return float64(len(m.typedWords)) / float64(len(*m.words))
+}
+
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     switch msg := msg.(type) {
+    case time.Time:
+        return m, tea.Batch(tickCmd(), m.ProgressBar.SetPercent(m.calculateProgressPercentage()))
+
     case tea.KeyMsg:
         switch msg.String() {
         case tea.KeySpace.String():
@@ -93,7 +114,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             }
             m.pos[0]++
             m.pos[1] = 0
-            return m, m.ProgressBar.SetPercent(float64(len(m.typedWords)) / float64(len(*m.words)))
 
         case tea.KeyBackspace.String():
             if m.pos[1]--; m.pos[1] < 0 {
@@ -105,7 +125,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             } else {
                 m.typedWords[m.pos[0]] = m.typedWords[m.pos[0]][:m.pos[1]]
             }
-            return m, m.ProgressBar.SetPercent(float64(len(m.typedWords)) / float64(len(*m.words)))
 
         default:
             if !m.started {

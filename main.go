@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/taz03/monkeytui/config"
@@ -40,7 +39,7 @@ func (m model) calculateTestWidth() int {
 }
 
 func (m model) Init() tea.Cmd {
-	return nil
+	return m.Test.Init()
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -48,27 +47,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		width, height = msg.Width, msg.Height
 
-    case progress.FrameMsg:
-        _, cmd := m.Test.Update(msg)
-        return m, cmd
-
 	case tea.KeyMsg:
         if msg.String() == m.Config.RestartKey() {
             m.Test = test.New(m.Config)
             m.Test.Width = m.calculateTestWidth()
-            break
+            return m, m.Test.Init()
         }
 
 		switch msg.String() {
 		case tea.KeyCtrlC.String():
 			return m, tea.Quit
-		default:
-            _, cmd := m.Test.Update(msg)
-            return m, cmd
 		}
 	}
 
-	return m, nil
+    _, cmd := m.Test.Update(msg)
+	return m, cmd
 }
 
 func (m model) View() string {
