@@ -21,7 +21,6 @@ func main() {
 		Test:   test.New(userConfig),
 		Config: userConfig,
 	}, tea.WithAltScreen())
-	go userConfig.MonkeyTheme.Update(app)
 
 	app.Run()
 }
